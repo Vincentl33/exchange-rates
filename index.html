@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>China Stock & FX Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      margin: 10px 0;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>📈 China Stock & FX Dashboard</h1>
+  <div class="card">
+    <h2>Shanghai Composite Index (SSE)</h2>
+    <p id="sse">Loading...</p>
+  </div>
+  <div class="card">
+    <h2>Shenzhen Component Index (SZSE)</h2>
+    <p id="szse">Loading...</p>
+  </div>
+  <div class="card">
+    <h2>Exchange Rates (RMB)</h2>
+    <p>AUD: <span id="aud">Loading...</span></p>
+    <p>GBP: <span id="gbp">Loading...</span></p>
+  </div>
+
+  <script>
+    async function fetchStockData() {
+      try {
+        const response = await fetch("https://api.maicoin.com/v1/market/china-stocks");
+        const data = await response.json();
+        document.getElementById("sse").innerText = data.sse || "Unavailable";
+        document.getElementById("szse").innerText = data.szse || "Unavailable";
+      } catch (error) {
+        document.getElementById("sse").innerText = "Error fetching SSE";
+        document.getElementById("szse").innerText = "Error fetching SZSE";
+      }
+    }
+
+    async function fetchFXRates() {
+      try {
+        const response = await fetch("https://api.exchangerate.host/latest?base=CNY&symbols=AUD,GBP");
+        const data = await response.json();
+        document.getElementById("aud").innerText = data.rates.AUD.toFixed(4);
+        document.getElementById("gbp").innerText = data.rates.GBP.toFixed(4);
+      } catch (error) {
+        document.getElementById("aud").innerText = "Error";
+        document.getElementById("gbp").innerText = "Error";
+      }
+    }
+
+    function updateAll() {
+      fetchStockData();
+      fetchFXRates();
+    }
+
+    // Initial fetch
+    updateAll();
+    // Refresh every 60 seconds
+    setInterval(updateAll, 60000);
+  </script>
+</body>
+</html>
